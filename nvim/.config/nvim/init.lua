@@ -20,22 +20,6 @@ require("rose-pine").setup({
 
 vim.cmd.colorscheme("rose-pine")
 
-local transparent_groups = {
-  "Normal",
-  "NormalNC",
-  "NormalFloat",
-  "FloatBorder",
-  "SignColumn",
-  "LineNr",
-  "CursorLineNr",
-  "StatusLine",
-  "StatusLineNC",
-}
-
-for _, group in ipairs(transparent_groups) do
-  vim.api.nvim_set_hl(0, group, { bg = "none" })
-end
-
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.cursorline = true
