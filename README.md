@@ -10,4 +10,5 @@ git clone --recurse-submodules git@github.com:jeremysco/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 stow tmux
 stow nvim
+stow ghostty
 ```
