@@ -24,6 +24,14 @@ require("rose-pine").setup({
 
 vim.cmd.colorscheme("rose-pine")
 
+vim.api.nvim_set_hl(0, "Pmenu", { fg = "#e0def4", bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
+vim.api.nvim_set_hl(0, "PmenuKind", { fg = "#9ccfd8", bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuExtra", { fg = "#908caa", bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuSbar", { bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuThumb", { bg = "#524f67" })
+vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#908caa", bg = "#26233a" })
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.cursorline = true
@@ -47,6 +55,7 @@ vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
 vim.o.completeopt = "menuone,noselect,popup"
+vim.o.pumheight = 10
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
@@ -148,6 +157,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
       vim.lsp.completion.enable(true, client.id, event.buf, {
         autotrigger = true,
+        convert = function(item)
+          return {
+            abbr = item.label:gsub("%b()", ""),
+            kind = item.kind and vim.lsp.protocol.CompletionItemKind[item.kind] or "",
+            menu = client.name,
+          }
+        end,
       })
     end
 
