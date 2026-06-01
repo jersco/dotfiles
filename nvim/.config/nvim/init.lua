@@ -54,7 +54,7 @@ vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
-vim.o.completeopt = "menuone,noselect,popup"
+vim.o.completeopt = "menuone,popup"
 vim.o.pumheight = 10
 vim.opt.wildignore:append({
   "*/.git/*",
@@ -149,12 +149,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local opts = { buffer = event.buf }
 
     if client:supports_method("textDocument/completion") then
-      local chars = {}
-      for i = 32, 126 do
-        table.insert(chars, string.char(i))
-      end
-      client.server_capabilities.completionProvider.triggerCharacters = chars
-
       vim.lsp.completion.enable(true, client.id, event.buf, {
         autotrigger = true,
         convert = function(item)
@@ -227,6 +221,18 @@ vim.keymap.set("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 vim.keymap.set("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
 vim.keymap.set("n", "<leader>:", fzf.command_history, { desc = "Command history" })
+vim.keymap.set("i", "<tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<c-y>"
+  end
+  return "<tab>"
+end, { expr = true, desc = "Accept completion or insert tab" })
+vim.keymap.set("i", "<cr>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<c-y>"
+  end
+  return "<cr>"
+end, { expr = true, desc = "Accept completion or newline" })
 vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
 vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
