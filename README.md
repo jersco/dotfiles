@@ -11,4 +11,5 @@ cd ~/dotfiles
 stow tmux
 stow nvim
 stow ghostty
+stow zsh
 ```
