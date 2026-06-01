@@ -7,6 +7,7 @@ vim.pack.add({
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
+  { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
 }, { confirm = false })
 
 vim.o.termguicolors = true
@@ -61,11 +62,6 @@ vim.opt.wildignore:append({
   "*/build/*",
 })
 
-vim.g.netrw_banner = 0
-vim.g.netrw_liststyle = 3
-vim.g.netrw_browse_split = 0
-vim.g.netrw_winsize = 25
-
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
   callback = vim.highlight.on_yank,
@@ -75,6 +71,27 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 local fzf = require("fzf-lua")
 local map = vim.keymap.set
+
+require("oil").setup({
+  default_file_explorer = true,
+  columns = { "icon" },
+  delete_to_trash = true,
+  view_options = {
+    show_hidden = true,
+  },
+  float = {
+    border = "rounded",
+  },
+  confirmation = {
+    border = "rounded",
+  },
+  progress = {
+    border = "rounded",
+  },
+  keymaps_help = {
+    border = "rounded",
+  },
+})
 
 require("lualine").setup({
   options = {
@@ -213,14 +230,15 @@ map("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
 map("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
 map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
 map("i", "kj", "<esc>", { desc = "Exit insert mode" })
-map("n", "<leader>e", "<cmd>Explore<cr>", { desc = "Open file explorer" })
-map("n", "<leader>E", "<cmd>Lexplore<cr>", { desc = "Toggle side explorer" })
+map("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open file explorer" })
+map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "Open floating file explorer" })
+map("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
 map("n", "<leader>f", fzf.files, { desc = "Find files" })
 map("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })
 map("n", "<leader>b", fzf.buffers, { desc = "Find buffers" })
 map("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 map("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
-map("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
+map("n", "<leader>/", fzf.lgrep_curbuf, { desc = "Live grep current buffer" })
 map("n", "<leader>:", fzf.command_history, { desc = "Command history" })
 map("i", "<tab>", function()
   if vim.fn.pumvisible() == 1 then
