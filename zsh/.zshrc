@@ -114,15 +114,3 @@ npx() {
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
   npx "$@"
 }
-
-# ==============================================================================
-# Aliases
-# ==============================================================================
-
-alias ..="cd .."
-alias ...="cd ../.."
-alias ls="ls -G"
-alias ll="ls -lahG"
-alias grep="grep --color=auto"
-alias mv="mv -i"
-alias cp="cp -i"
