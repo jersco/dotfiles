@@ -133,6 +133,8 @@ vim.diagnostic.config({
   },
 })
 
+vim.lsp.inline_completion.enable()
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
     local opts = { buffer = event.buf }
@@ -197,6 +199,21 @@ vim.keymap.set("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 vim.keymap.set("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
 vim.keymap.set("n", "<leader>:", fzf.command_history, { desc = "Command history" })
+vim.keymap.set("i", "<tab>", function()
+  if vim.lsp.inline_completion.get() then
+    return ""
+  end
+  return "<tab>"
+end, { expr = true, desc = "Accept inline completion" })
+vim.keymap.set("i", "<m-]>", function()
+  vim.lsp.inline_completion.select({ count = 1 })
+end, { desc = "Next inline completion" })
+vim.keymap.set("i", "<m-[>", function()
+  vim.lsp.inline_completion.select({ count = -1 })
+end, { desc = "Previous inline completion" })
+vim.keymap.set("n", "<leader>lt", function()
+  vim.lsp.inline_completion.enable(not vim.lsp.inline_completion.is_enabled())
+end, { desc = "Toggle inline completion" })
 vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
 vim.keymap.set("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
