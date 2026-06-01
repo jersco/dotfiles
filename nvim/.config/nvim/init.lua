@@ -46,6 +46,7 @@ vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
+vim.o.completeopt = "menuone,noselect,popup"
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
@@ -133,11 +134,22 @@ vim.diagnostic.config({
   },
 })
 
-vim.lsp.inline_completion.enable()
-
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
+    local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
     local opts = { buffer = event.buf }
+
+    if client:supports_method("textDocument/completion") then
+      local chars = {}
+      for i = 32, 126 do
+        table.insert(chars, string.char(i))
+      end
+      client.server_capabilities.completionProvider.triggerCharacters = chars
+
+      vim.lsp.completion.enable(true, client.id, event.buf, {
+        autotrigger = true,
+      })
+    end
 
     vim.keymap.set("n", "gd", fzf.lsp_definitions, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
@@ -199,21 +211,7 @@ vim.keymap.set("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 vim.keymap.set("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
 vim.keymap.set("n", "<leader>:", fzf.command_history, { desc = "Command history" })
-vim.keymap.set("i", "<tab>", function()
-  if vim.lsp.inline_completion.get() then
-    return ""
-  end
-  return "<tab>"
-end, { expr = true, desc = "Accept inline completion" })
-vim.keymap.set("i", "<m-]>", function()
-  vim.lsp.inline_completion.select({ count = 1 })
-end, { desc = "Next inline completion" })
-vim.keymap.set("i", "<m-[>", function()
-  vim.lsp.inline_completion.select({ count = -1 })
-end, { desc = "Previous inline completion" })
-vim.keymap.set("n", "<leader>lt", function()
-  vim.lsp.inline_completion.enable(not vim.lsp.inline_completion.is_enabled())
-end, { desc = "Toggle inline completion" })
+vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
 vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
 vim.keymap.set("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
