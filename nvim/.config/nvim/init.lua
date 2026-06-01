@@ -27,7 +27,12 @@ vim.cmd.colorscheme("rose-pine")
 vim.api.nvim_set_hl(0, "Pmenu", { fg = "#e0def4", bg = "#26233a" })
 vim.api.nvim_set_hl(0, "PmenuSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
 vim.api.nvim_set_hl(0, "PmenuKind", { fg = "#9ccfd8", bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuKindSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
 vim.api.nvim_set_hl(0, "PmenuExtra", { fg = "#908caa", bg = "#26233a" })
+vim.api.nvim_set_hl(0, "PmenuExtraSel", { fg = "#191724", bg = "#c4a7e7" })
+vim.api.nvim_set_hl(0, "PmenuMatch", { fg = "#f6c177", bg = "#26233a", bold = true })
+vim.api.nvim_set_hl(0, "PmenuMatchSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
+vim.api.nvim_set_hl(0, "PmenuBorder", { fg = "#6e6a86", bg = "#26233a" })
 vim.api.nvim_set_hl(0, "PmenuSbar", { bg = "#26233a" })
 vim.api.nvim_set_hl(0, "PmenuThumb", { bg = "#524f67" })
 vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#908caa", bg = "#26233a" })
@@ -55,7 +60,10 @@ vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
 vim.o.completeopt = "menuone,popup"
+vim.o.pumborder = "rounded"
 vim.o.pumheight = 10
+vim.o.pumwidth = 35
+vim.o.pummaxwidth = 90
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
