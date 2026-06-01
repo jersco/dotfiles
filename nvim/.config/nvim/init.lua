@@ -24,17 +24,7 @@ require("rose-pine").setup({
 
 vim.cmd.colorscheme("rose-pine")
 
-vim.api.nvim_set_hl(0, "Pmenu", { fg = "#e0def4", bg = "#26233a" })
-vim.api.nvim_set_hl(0, "PmenuSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
-vim.api.nvim_set_hl(0, "PmenuKind", { fg = "#9ccfd8", bg = "#26233a" })
-vim.api.nvim_set_hl(0, "PmenuKindSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
-vim.api.nvim_set_hl(0, "PmenuExtra", { fg = "#908caa", bg = "#26233a" })
-vim.api.nvim_set_hl(0, "PmenuExtraSel", { fg = "#191724", bg = "#c4a7e7" })
-vim.api.nvim_set_hl(0, "PmenuMatch", { fg = "#f6c177", bg = "#26233a", bold = true })
-vim.api.nvim_set_hl(0, "PmenuMatchSel", { fg = "#191724", bg = "#c4a7e7", bold = true })
 vim.api.nvim_set_hl(0, "PmenuBorder", { fg = "#6e6a86", bg = "#26233a" })
-vim.api.nvim_set_hl(0, "PmenuSbar", { bg = "#26233a" })
-vim.api.nvim_set_hl(0, "PmenuThumb", { bg = "#524f67" })
 vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#908caa", bg = "#26233a" })
 
 vim.o.number = true
@@ -78,14 +68,13 @@ vim.g.netrw_winsize = 25
 
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
+  callback = vim.highlight.on_yank,
   group = highlight_group,
   pattern = "*",
 })
 
 local fzf = require("fzf-lua")
+local map = vim.keymap.set
 
 require("lualine").setup({
   options = {
@@ -154,7 +143,7 @@ vim.diagnostic.config({
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
     local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
-    local opts = { buffer = event.buf }
+    local opts = { buffer = event.buf, silent = true }
 
     if client:supports_method("textDocument/completion") then
       vim.lsp.completion.enable(true, client.id, event.buf, {
@@ -169,18 +158,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
 
-    vim.keymap.set("n", "gd", fzf.lsp_definitions, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
-    vim.keymap.set("n", "gr", fzf.lsp_references, vim.tbl_extend("force", opts, { desc = "Find references" }))
-    vim.keymap.set("n", "gI", fzf.lsp_implementations, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
-    vim.keymap.set("n", "gy", fzf.lsp_typedefs, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
-    vim.keymap.set("n", "K", function()
+    local function lsp_map(mode, lhs, rhs, desc)
+      map(mode, lhs, rhs, vim.tbl_extend("force", opts, { desc = desc }))
+    end
+
+    lsp_map("n", "gd", fzf.lsp_definitions, "Go to definition")
+    lsp_map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+    lsp_map("n", "gr", fzf.lsp_references, "Find references")
+    lsp_map("n", "gI", fzf.lsp_implementations, "Go to implementation")
+    lsp_map("n", "gy", fzf.lsp_typedefs, "Go to type definition")
+    lsp_map("n", "K", function()
       vim.lsp.buf.hover({ border = "rounded" })
-    end, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
-    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
-    vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
-    vim.keymap.set("n", "<leader>ld", fzf.diagnostics_document, vim.tbl_extend("force", opts, { desc = "Document diagnostics" }))
-    vim.keymap.set("n", "<leader>lD", fzf.diagnostics_workspace, vim.tbl_extend("force", opts, { desc = "Workspace diagnostics" }))
+    end, "Hover documentation")
+    lsp_map("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+    lsp_map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
+    lsp_map("n", "<leader>ld", fzf.diagnostics_document, "Document diagnostics")
+    lsp_map("n", "<leader>lD", fzf.diagnostics_workspace, "Workspace diagnostics")
   end,
 })
 
@@ -216,52 +209,42 @@ for server, executable in pairs(servers) do
   end
 end
 
-vim.keymap.set("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
-vim.keymap.set("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
-vim.keymap.set("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
-vim.keymap.set("i", "kj", "<esc>", { desc = "Exit insert mode" })
-vim.keymap.set("n", "<leader>e", "<cmd>Explore<cr>", { desc = "Open file explorer" })
-vim.keymap.set("n", "<leader>E", "<cmd>Lexplore<cr>", { desc = "Toggle side explorer" })
-vim.keymap.set("n", "<leader>f", fzf.files, { desc = "Find files" })
-vim.keymap.set("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })
-vim.keymap.set("n", "<leader>b", fzf.buffers, { desc = "Find buffers" })
-vim.keymap.set("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
-vim.keymap.set("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
-vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
-vim.keymap.set("n", "<leader>:", fzf.command_history, { desc = "Command history" })
-vim.keymap.set("i", "<tab>", function()
+map("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
+map("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
+map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
+map("i", "kj", "<esc>", { desc = "Exit insert mode" })
+map("n", "<leader>e", "<cmd>Explore<cr>", { desc = "Open file explorer" })
+map("n", "<leader>E", "<cmd>Lexplore<cr>", { desc = "Toggle side explorer" })
+map("n", "<leader>f", fzf.files, { desc = "Find files" })
+map("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })
+map("n", "<leader>b", fzf.buffers, { desc = "Find buffers" })
+map("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
+map("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
+map("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
+map("n", "<leader>:", fzf.command_history, { desc = "Command history" })
+map("i", "<tab>", function()
   if vim.fn.pumvisible() == 1 then
     return "<c-y>"
   end
   return "<tab>"
 end, { expr = true, desc = "Accept completion or insert tab" })
-vim.keymap.set("i", "<cr>", function()
+map("i", "<cr>", function()
   if vim.fn.pumvisible() == 1 then
     return "<c-y>"
   end
   return "<cr>"
 end, { expr = true, desc = "Accept completion or newline" })
-vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
-vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
-vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
-vim.keymap.set("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
-vim.keymap.set("n", "<leader>cc", "<cmd>cclose<cr>", { desc = "Close quickfix" })
-vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
-vim.keymap.set("n", "[q", "<cmd>cprev<cr>", { desc = "Previous quickfix item" })
-vim.keymap.set("n", "<leader>cn", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
-vim.keymap.set("n", "<leader>cp", "<cmd>cprev<cr>", { desc = "Previous quickfix item" })
-
-vim.keymap.set("n", "<c-w>h", "<c-w>h", { desc = "Move to left window" })
-vim.keymap.set("n", "<c-w>j", "<c-w>j", { desc = "Move to lower window" })
-vim.keymap.set("n", "<c-w>k", "<c-w>k", { desc = "Move to upper window" })
-vim.keymap.set("n", "<c-w>l", "<c-w>l", { desc = "Move to right window" })
-
-
-vim.keymap.set("n", "<leader>sh", "<cmd>split<cr>", { desc = "Split window horizontally" })
-vim.keymap.set("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close current split" })
-vim.keymap.set("n", "<leader>se", "<c-w>=", { desc = "Equalize split sizes" })
-
-vim.keymap.set("n", "<leader>sr", "<cmd>resize +5<cr>", { desc = "Increase split height" })
-vim.keymap.set("n", "<leader>sR", "<cmd>resize -5<cr>", { desc = "Decrease split height" })
-vim.keymap.set("n", "<leader>sc", "<cmd>vertical resize +10<cr>", { desc = "Increase split width" })
-vim.keymap.set("n", "<leader>sC", "<cmd>vertical resize -10<cr>", { desc = "Decrease split width" })
+map("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
+map("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
+map("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
+map("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
+map("n", "<leader>cc", "<cmd>cclose<cr>", { desc = "Close quickfix" })
+map("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
+map("n", "[q", "<cmd>cprev<cr>", { desc = "Previous quickfix item" })
+map("n", "<leader>sh", "<cmd>split<cr>", { desc = "Split window horizontally" })
+map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close current split" })
+map("n", "<leader>se", "<c-w>=", { desc = "Equalize split sizes" })
+map("n", "<leader>sr", "<cmd>resize +5<cr>", { desc = "Increase split height" })
+map("n", "<leader>sR", "<cmd>resize -5<cr>", { desc = "Decrease split height" })
+map("n", "<leader>sc", "<cmd>vertical resize +10<cr>", { desc = "Increase split width" })
+map("n", "<leader>sC", "<cmd>vertical resize -10<cr>", { desc = "Decrease split width" })
