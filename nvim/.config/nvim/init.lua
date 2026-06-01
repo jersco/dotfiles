@@ -8,6 +8,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
   { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
+  { src = "https://github.com/vieitesss/miniharp.nvim", name = "miniharp", version = vim.version.range("v*") },
 }, { confirm = false })
 
 vim.o.termguicolors = true
@@ -72,7 +73,20 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 local fzf = require("fzf-lua")
+local miniharp = require("miniharp")
 local map = vim.keymap.set
+
+miniharp.setup({
+  autoload = true,
+  autosave = true,
+  show_on_autoload = false,
+  notifications = true,
+  ui = {
+    position = "center",
+    show_hints = true,
+    enter = true,
+  },
+})
 
 require("oil").setup({
   default_file_explorer = true,
@@ -242,6 +256,16 @@ map("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 map("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
 map("n", "<leader>/", fzf.lgrep_curbuf, { desc = "Live grep current buffer" })
 map("n", "<leader>:", fzf.command_history, { desc = "Command history" })
+map("n", "<leader>ma", miniharp.toggle_file, { desc = "Toggle file mark" })
+map("n", "<leader>mm", miniharp.show_list, { desc = "Show file marks" })
+map("n", "<leader>mM", miniharp.enter_list, { desc = "Enter file marks" })
+map("n", "]m", miniharp.next, { desc = "Next file mark" })
+map("n", "[m", miniharp.prev, { desc = "Previous file mark" })
+for i = 1, 4 do
+  map("n", "<leader>m" .. i, function()
+    miniharp.go_to(i)
+  end, { desc = "Go to file mark " .. i })
+end
 map("i", "<tab>", function()
   if vim.fn.pumvisible() == 1 then
     return "<c-n>"

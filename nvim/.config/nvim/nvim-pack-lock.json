@@ -8,6 +8,10 @@
       "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
+    "miniharp": {
+      "rev": "a8fd9dadba00119f1d610936ef694515c448a47c",
+      "src": "https://github.com/vieitesss/miniharp.nvim"
+    },
     "nvim-lspconfig": {
       "rev": "9573948c38bfabeec353ae7dd7d3ffec4c506a6b",
       "src": "https://github.com/neovim/nvim-lspconfig"
