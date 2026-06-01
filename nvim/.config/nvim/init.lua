@@ -43,9 +43,6 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
-vim.o.grepprg = "rg --vimgrep --smart-case --hidden --glob '!**/.git/*'"
-vim.o.grepformat = "%f:%l:%c:%m"
-vim.opt.path:append("**")
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
