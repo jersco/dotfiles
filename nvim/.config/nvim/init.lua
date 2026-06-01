@@ -3,7 +3,9 @@ vim.g.maplocalleader = " "
 
 vim.pack.add({
   { src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
+  { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
+  { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
 }, { confirm = false })
 
@@ -56,6 +58,39 @@ vim.g.netrw_browse_split = 0
 vim.g.netrw_winsize = 25
 
 local fzf = require("fzf-lua")
+
+require("lualine").setup({
+  options = {
+    theme = "auto",
+    globalstatus = true,
+    component_separators = { left = "│", right = "│" },
+    section_separators = { left = "", right = "" },
+  },
+  sections = {
+    lualine_a = { "mode" },
+    lualine_b = { "branch", "diff" },
+    lualine_c = {
+      { "filename", path = 1 },
+    },
+    lualine_x = {
+      { "diagnostics", sources = { "nvim_diagnostic" } },
+      "lsp_status",
+      "filetype",
+    },
+    lualine_y = { "progress" },
+    lualine_z = { "location" },
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {
+      { "filename", path = 1 },
+    },
+    lualine_x = { "location" },
+    lualine_y = {},
+    lualine_z = {},
+  },
+})
 
 fzf.setup({
   "default",
@@ -147,6 +182,8 @@ vim.keymap.set("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 vim.keymap.set("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>/", fzf.blines, { desc = "Search current buffer" })
 vim.keymap.set("n", "<leader>:", fzf.command_history, { desc = "Command history" })
+vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
+vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
 vim.keymap.set("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
 vim.keymap.set("n", "<leader>cc", "<cmd>cclose<cr>", { desc = "Close quickfix" })
 vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
