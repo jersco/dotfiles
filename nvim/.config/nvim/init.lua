@@ -45,6 +45,7 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
+vim.o.winborder = "rounded"
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
@@ -118,6 +119,9 @@ vim.diagnostic.config({
   underline = true,
   update_in_insert = false,
   severity_sort = true,
+  float = {
+    border = "rounded",
+  },
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -129,7 +133,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gr", fzf.lsp_references, vim.tbl_extend("force", opts, { desc = "Find references" }))
     vim.keymap.set("n", "gI", fzf.lsp_implementations, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
     vim.keymap.set("n", "gy", fzf.lsp_typedefs, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
+    vim.keymap.set("n", "K", function()
+      vim.lsp.buf.hover({ border = "rounded" })
+    end, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
     vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
     vim.keymap.set("n", "<leader>ld", fzf.diagnostics_document, vim.tbl_extend("force", opts, { desc = "Document diagnostics" }))
