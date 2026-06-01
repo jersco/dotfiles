@@ -6,6 +6,7 @@ Personal tmux and Neovim configuration managed with GNU Stow.
 
 ```sh
 brew install stow
+brew install fzf ripgrep fd lua-language-server typescript-language-server zls
 git clone --recurse-submodules git@github.com:jeremysco/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 stow tmux

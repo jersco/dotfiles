@@ -1,5 +1,13 @@
 {
   "plugins": {
+    "fzf-lua": {
+      "rev": "d340ade20dfe4ef87e6f9a63b9905be91965b5dc",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "nvim-lspconfig": {
+      "rev": "9573948c38bfabeec353ae7dd7d3ffec4c506a6b",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
     "rose-pine": {
       "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
       "src": "https://github.com/rose-pine/neovim"
