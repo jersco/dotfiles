@@ -50,7 +50,9 @@ vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
-vim.o.completeopt = "menuone"
+vim.o.autocomplete = true
+vim.o.autocompletedelay = 120
+vim.o.completeopt = "menuone,noselect,fuzzy"
 vim.o.pumborder = "rounded"
 vim.o.pumheight = 10
 vim.o.pumwidth = 35
@@ -242,10 +244,10 @@ map("n", "<leader>/", fzf.lgrep_curbuf, { desc = "Live grep current buffer" })
 map("n", "<leader>:", fzf.command_history, { desc = "Command history" })
 map("i", "<tab>", function()
   if vim.fn.pumvisible() == 1 then
-    return "<c-y>"
+    return "<c-n>"
   end
   return "<tab>"
-end, { expr = true, desc = "Accept completion or insert tab" })
+end, { expr = true, desc = "Select completion or insert tab" })
 map("i", "<cr>", function()
   if vim.fn.pumvisible() == 1 then
     return "<c-y>"
