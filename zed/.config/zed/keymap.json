@@ -1,0 +1,102 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    }
+  },
+  {
+    "context": "vim_mode == insert",
+    "bindings": {
+      "k j": "vim::NormalBefore"
+    }
+  },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "space w": "workspace::Save",
+      "space shift-w": "workspace::SaveAll",
+
+      "space f": "file_finder::Toggle",
+      // "space e": "project_panel::ToggleFocus",
+      "space e": ["action::Sequence", ["pane::RevealInProjectPanel", "project_panel::ToggleFocus"]],
+      "space /": "pane::DeploySearch",
+      "space o": "outline::Toggle",
+      "space g": "git_panel::ToggleFocus",
+      "space a": "agent::ToggleFocus",
+
+      "space d": "diagnostics::Deploy",
+      "space shift-d": "diagnostics::DeployCurrentFile",
+
+      "space r": "editor::Rename",
+      "space c a": "editor::ToggleCodeActions",
+      "space c f": "editor::Format",
+
+      "space b d": "pane::CloseActiveItem",
+      "space b o": "pane::CloseOtherItems",
+      "space b p": "pane::ActivatePreviousItem",
+      "space b n": "pane::ActivateNextItem",
+
+      "space v": "pane::SplitRight",
+      "space shift-v": "pane::SplitLeft",
+      "space shift-s": "pane::SplitDown",
+      "space s": "pane::SplitUp",
+
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    "context": "vim_operator == a || vim_operator == i || vim_operator == cs",
+    "bindings": {
+      "q": "vim::AnyQuotes",
+      "b": "vim::AnyBrackets",
+      "Q": "vim::MiniQuotes",
+      "B": "vim::MiniBrackets"
+    }
+  },
+  {
+    "context": "Dock",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "space e": "workspace::ToggleRightDock",
+      "escape": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "GitPanel",
+    "bindings": {
+      "space g": "workspace::ToggleRightDock",
+      "escape": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "escape": "workspace::ToggleBottomDock",
+      "cmd-n": "workspace::NewTerminal",
+      "cmd-d": "pane::SplitRight",
+      "cmd-shift-d": "pane::SplitDown",
+      "cmd-shift-a": "pane::SplitLeft",
+      "cmd-w": "pane::CloseActiveItem",
+      "cmd-shift-r": "terminal::RenameTerminal"
+    }
+  }
+]

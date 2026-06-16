@@ -13,4 +13,5 @@ stow tmux
 stow nvim
 stow ghostty
 stow zsh
+stow zed
 ```
