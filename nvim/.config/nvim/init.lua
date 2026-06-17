@@ -8,6 +8,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
+  { src = "https://github.com/b0o/schemastore.nvim", name = "schemastore" },
   { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
   { src = "https://github.com/vieitesss/miniharp.nvim", name = "miniharp", version = vim.version.range("v*") },
   { src = "https://github.com/folke/which-key.nvim", name = "which-key" },
@@ -131,12 +132,16 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = {
     "bash",
     "c",
+    "javascript",
+    "json",
     "lua",
     "markdown",
     "rust",
+    "tsx",
     "typescript",
     "vim",
     "vimdoc",
+    "yaml",
     "zig",
   },
   callback = function()
@@ -246,6 +251,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
 
+    if vim.lsp.inlay_hint and client:supports_method("textDocument/inlayHint") then
+      vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+    end
+
     local function lsp_map(mode, lhs, rhs, desc)
       map(mode, lhs, rhs, vim.tbl_extend("force", opts, { desc = desc }))
     end
@@ -284,10 +293,36 @@ vim.lsp.config("lua_ls", {
   },
 })
 
+vim.lsp.config("jsonls", {
+  settings = {
+    json = {
+      schemas = require("schemastore").json.schemas(),
+      validate = { enable = true },
+    },
+  },
+})
+
+vim.lsp.config("yamlls", {
+  settings = {
+    yaml = {
+      schemaStore = {
+        enable = false,
+        url = "",
+      },
+      schemas = require("schemastore").yaml.schemas(),
+      validate = true,
+      completion = true,
+      hover = true,
+    },
+  },
+})
+
 local servers = {
+  jsonls = "vscode-json-language-server",
   lua_ls = "lua-language-server",
   pyright = "pyright-langserver",
   ts_ls = "typescript-language-server",
+  yamlls = "yaml-language-server",
   zls = "zls",
 }
 
