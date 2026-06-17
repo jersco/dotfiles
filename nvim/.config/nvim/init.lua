@@ -6,13 +6,17 @@ vim.pack.add({
   { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
   { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
   { src = "https://github.com/vieitesss/miniharp.nvim", name = "miniharp", version = vim.version.range("v*") },
+  { src = "https://github.com/folke/which-key.nvim", name = "which-key" },
 }, { confirm = false })
 
 vim.o.termguicolors = true
 vim.o.background = "dark"
+vim.o.mouse = "a"
+vim.o.clipboard = "unnamedplus"
 
 require("rose-pine").setup({
   variant = "main",
@@ -34,6 +38,7 @@ vim.o.relativenumber = true
 vim.o.cursorline = true
 vim.o.signcolumn = "yes"
 vim.o.wrap = false
+vim.o.breakindent = true
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
 
@@ -42,6 +47,9 @@ vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 vim.o.expandtab = true
 vim.o.smartindent = true
+vim.o.textwidth = 80
+vim.o.list = true
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -109,6 +117,34 @@ require("oil").setup({
   },
 })
 
+require("nvim-treesitter").setup()
+
+require("which-key").setup({
+  spec = {
+    { "<leader>c", group = "Code" },
+    { "<leader>l", group = "LSP" },
+    { "<leader>s", group = "Splits" },
+  },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "bash",
+    "c",
+    "lua",
+    "markdown",
+    "rust",
+    "typescript",
+    "vim",
+    "vimdoc",
+    "zig",
+  },
+  callback = function()
+    pcall(vim.treesitter.start)
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+})
+
 require("lualine").setup({
   options = {
     theme = "auto",
@@ -164,7 +200,14 @@ fzf.setup({
 
 vim.diagnostic.config({
   virtual_text = true,
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = " ",
+      [vim.diagnostic.severity.WARN] = " ",
+      [vim.diagnostic.severity.INFO] = " ",
+      [vim.diagnostic.severity.HINT] = " ",
+    },
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
@@ -177,6 +220,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
     local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
     local opts = { buffer = event.buf, silent = true }
+
+    if client:supports_method("textDocument/formatting") then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = event.buf,
+        callback = function()
+          vim.lsp.buf.format({
+            bufnr = event.buf,
+            timeout_ms = 3000,
+          })
+        end,
+      })
+    end
 
     if client:supports_method("textDocument/completion") then
       vim.lsp.completion.enable(true, client.id, event.buf, {
