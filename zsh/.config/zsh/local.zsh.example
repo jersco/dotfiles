@@ -1,0 +1,6 @@
+# Copy this to ~/.config/zsh/local.zsh for machine-specific settings.
+# Do not commit secrets or work-only values.
+
+# Example:
+# export WORKSPACE="$HOME/work"
+# alias workrepo="cd $WORKSPACE/repo"
