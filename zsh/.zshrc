@@ -10,6 +10,7 @@ path=(
   "$HOME/.local/bin"
   "$HOME/.bun/bin"
   "$HOME/Library/pnpm"
+  "$HOME/.emacs.d/bin"
   $path
 )
 export PATH
@@ -114,3 +115,6 @@ npx() {
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
   npx "$@"
 }
+
+# opencode
+export PATH=/Users/jeremysco/.opencode/bin:$PATH
