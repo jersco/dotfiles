@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "fff.nvim": {
+      "rev": "797c045aa93e03e3cec3497a76afe7cb0106bdc2",
+      "src": "https://github.com/dmtrKovalenko/fff.nvim"
+    },
     "fzf-lua": {
       "rev": "d340ade20dfe4ef87e6f9a63b9905be91965b5dc",
       "src": "https://github.com/ibhagwan/fzf-lua"
@@ -7,6 +11,14 @@
     "lualine": {
       "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
+    "mason": {
+      "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
+      "src": "https://github.com/mason-org/mason.nvim"
+    },
+    "mason-tool-installer": {
+      "rev": "443f1ef8b5e6bf47045cb2217b6f748a223cf7dc",
+      "src": "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
     },
     "miniharp": {
       "rev": "a8fd9dadba00119f1d610936ef694515c448a47c",

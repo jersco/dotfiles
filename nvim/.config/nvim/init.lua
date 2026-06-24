@@ -5,9 +5,12 @@ vim.pack.add({
   { src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
+  { src = "https://github.com/dmtrKovalenko/fff.nvim", name = "fff.nvim" },
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
+  { src = "https://github.com/mason-org/mason.nvim", name = "mason" },
+  { src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim", name = "mason-tool-installer" },
   { src = "https://github.com/b0o/schemastore.nvim", name = "schemastore" },
   { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
   { src = "https://github.com/vieitesss/miniharp.nvim", name = "miniharp", version = vim.version.range("v*") },
@@ -81,6 +84,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   pattern = "*",
 })
 
+local fff = require("fff")
 local fzf = require("fzf-lua")
 local miniharp = require("miniharp")
 local map = vim.keymap.set
@@ -118,34 +122,54 @@ require("oil").setup({
   },
 })
 
-require("nvim-treesitter").setup()
+local treesitter = require("nvim-treesitter")
+
+treesitter.setup()
 
 require("which-key").setup({
   spec = {
-    { "<leader>c", group = "Code" },
+    { "<leader>c", group = "Code/quickfix" },
     { "<leader>l", group = "LSP" },
+    { "<leader>m", group = "miniharp" },
     { "<leader>s", group = "Splits" },
   },
 })
 
+local treesitter_parsers = {
+  bash = "bash",
+  c = "c",
+  javascript = "javascript",
+  json = "json",
+  lua = "lua",
+  markdown = "markdown",
+  markdown_inline = "markdown_inline",
+  python = "python",
+  query = "query",
+  rust = "rust",
+  sh = "bash",
+  tsx = "tsx",
+  typescript = "typescript",
+  vim = "vim",
+  vimdoc = "vimdoc",
+  yaml = "yaml",
+  zig = "zig",
+}
+
+local function install_treesitter_parsers()
+  pcall(treesitter.install, vim.tbl_values(treesitter_parsers))
+end
+
+install_treesitter_parsers()
+
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {
-    "bash",
-    "c",
-    "javascript",
-    "json",
-    "lua",
-    "markdown",
-    "rust",
-    "tsx",
-    "typescript",
-    "vim",
-    "vimdoc",
-    "yaml",
-    "zig",
-  },
+  pattern = vim.tbl_keys(treesitter_parsers),
   callback = function()
-    pcall(vim.treesitter.start)
+    local parser = treesitter_parsers[vim.bo.filetype]
+
+    if parser and not pcall(vim.treesitter.start) then
+      pcall(treesitter.install, { parser })
+    end
+
     vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end,
 })
@@ -200,6 +224,36 @@ fzf.setup({
     preview = {
       layout = "flex",
     },
+  },
+})
+
+fff.setup({
+  lazy_sync = true,
+  layout = {
+    height = 0.85,
+    width = 0.9,
+    preview_position = "right",
+    preview_size = 0.5,
+  },
+  grep = {
+    modes = { "plain", "regex", "fuzzy" },
+    smart_case = true,
+  },
+})
+
+require("mason").setup()
+
+require("mason-tool-installer").setup({
+  ensure_installed = {
+    "eslint-lsp",
+    "lua-language-server",
+    "prettier",
+    "pyright",
+    "typescript-language-server",
+    "json-lsp",
+    "tree-sitter-cli",
+    "yaml-language-server",
+    "zls",
   },
 })
 
@@ -317,7 +371,8 @@ vim.lsp.config("yamlls", {
   },
 })
 
-local servers = {
+local lsp_servers = {
+  eslint = "vscode-eslint-language-server",
   jsonls = "vscode-json-language-server",
   lua_ls = "lua-language-server",
   pyright = "pyright-langserver",
@@ -326,11 +381,23 @@ local servers = {
   zls = "zls",
 }
 
-for server, executable in pairs(servers) do
-  if vim.fn.executable(executable) == 1 then
-    vim.lsp.enable(server)
+local function enable_installed_lsp_servers()
+  for server, executable in pairs(lsp_servers) do
+    if vim.fn.executable(executable) == 1 then
+      vim.lsp.enable(server)
+    end
   end
 end
+
+enable_installed_lsp_servers()
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "MasonToolsUpdateCompleted",
+  callback = function()
+    enable_installed_lsp_servers()
+    install_treesitter_parsers()
+  end,
+})
 
 map("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
 map("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
@@ -339,8 +406,11 @@ map("i", "kj", "<esc>", { desc = "Exit insert mode" })
 map("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "Open floating file explorer" })
 map("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
-map("n", "<leader>f", fzf.files, { desc = "Find files" })
-map("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })
+map("n", "<leader>f", fff.find_files, { desc = "Find files" })
+map("n", "<leader>g", fff.live_grep, { desc = "Live grep" })
+map("n", "<leader>cw", function()
+  fff.live_grep({ query = vim.fn.expand("<cword>") })
+end, { desc = "Search current word" })
 map("n", "<leader>b", fzf.buffers, { desc = "Find buffers" })
 map("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
 map("n", "<leader>r", fzf.oldfiles, { desc = "Recent files" })
@@ -349,8 +419,8 @@ map("n", "<leader>:", fzf.command_history, { desc = "Command history" })
 map("n", "<leader>m", miniharp.toggle_file, { desc = "miniharp: toggle file mark" })
 map("n", "<c-n>", miniharp.next, { desc = "miniharp: next file mark" })
 map("n", "<c-p>", miniharp.prev, { desc = "miniharp: previous file mark" })
-map("n", "<leader>l", miniharp.show_list, { desc = "miniharp: toggle marks list" })
-map("n", "<leader>L", miniharp.enter_list, { desc = "miniharp: enter marks list" })
+map("n", "<leader>ml", miniharp.show_list, { desc = "miniharp: toggle marks list" })
+map("n", "<leader>mL", miniharp.enter_list, { desc = "miniharp: enter marks list" })
 for i = 1, 4 do
   map("n", "<leader>" .. i, function()
     miniharp.go_to(i)
@@ -370,6 +440,7 @@ map("i", "<cr>", function()
 end, { expr = true, desc = "Accept completion or newline" })
 map("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
 map("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
+map("n", "<leader>lm", "<cmd>Mason<cr>", { desc = "Mason" })
 map("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
 map("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
 map("n", "<leader>cc", "<cmd>cclose<cr>", { desc = "Close quickfix" })
