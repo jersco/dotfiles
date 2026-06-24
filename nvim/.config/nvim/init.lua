@@ -5,7 +5,6 @@ vim.pack.add({
   { src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
-  { src = "https://github.com/dmtrKovalenko/fff.nvim", name = "fff.nvim" },
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
@@ -84,7 +83,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   pattern = "*",
 })
 
-local fff = require("fff")
 local fzf = require("fzf-lua")
 local miniharp = require("miniharp")
 local map = vim.keymap.set
@@ -224,20 +222,6 @@ fzf.setup({
     preview = {
       layout = "flex",
     },
-  },
-})
-
-fff.setup({
-  lazy_sync = true,
-  layout = {
-    height = 0.85,
-    width = 0.9,
-    preview_position = "right",
-    preview_size = 0.5,
-  },
-  grep = {
-    modes = { "plain", "regex", "fuzzy" },
-    smart_case = true,
   },
 })
 
@@ -474,10 +458,10 @@ map("i", "kj", "<esc>", { desc = "Exit insert mode" })
 map("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "Open floating file explorer" })
 map("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
-map("n", "<leader>f", fff.find_files, { desc = "Find files" })
-map("n", "<leader>g", fff.live_grep, { desc = "Live grep" })
+map("n", "<leader>f", fzf.files, { desc = "Find files" })
+map("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })
 map("n", "<leader>cw", function()
-  fff.live_grep({ query = vim.fn.expand("<cword>") })
+  fzf.live_grep({ search = vim.fn.expand("<cword>") })
 end, { desc = "Search current word" })
 map("n", "<leader>b", fzf.buffers, { desc = "Find buffers" })
 map("n", "<leader>h", fzf.help_tags, { desc = "Find help" })
