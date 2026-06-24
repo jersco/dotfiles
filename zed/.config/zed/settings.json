@@ -303,5 +303,9 @@
   "terminal": {
     "font_family": "IosevkaTerm Nerd Font Mono"
   },
-  "theme": "Rosé Pine"
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Everforest Dark Soft (regular)"
+  }
 }
