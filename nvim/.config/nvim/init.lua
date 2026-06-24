@@ -245,15 +245,8 @@ require("mason").setup()
 
 require("mason-tool-installer").setup({
   ensure_installed = {
-    "eslint-lsp",
-    "lua-language-server",
     "prettier",
-    "pyright",
-    "typescript-language-server",
-    "json-lsp",
     "tree-sitter-cli",
-    "yaml-language-server",
-    "zls",
   },
 })
 
@@ -371,22 +364,88 @@ vim.lsp.config("yamlls", {
   },
 })
 
-local lsp_servers = {
-  eslint = "vscode-eslint-language-server",
-  jsonls = "vscode-json-language-server",
-  lua_ls = "lua-language-server",
-  pyright = "pyright-langserver",
-  ts_ls = "typescript-language-server",
-  yamlls = "yaml-language-server",
-  zls = "zls",
+local lsp_tools = {
+  eslint = { package = "eslint-lsp", executable = "vscode-eslint-language-server" },
+  jsonls = { package = "json-lsp", executable = "vscode-json-language-server" },
+  lua_ls = { package = "lua-language-server", executable = "lua-language-server" },
+  pyright = { package = "pyright", executable = "pyright-langserver" },
+  ts_ls = { package = "typescript-language-server", executable = "typescript-language-server" },
+  yamlls = { package = "yaml-language-server", executable = "yaml-language-server" },
+  zls = { package = "zls", executable = "zls" },
+}
+
+local lsp_filetypes = {
+  javascript = { "ts_ls", "eslint" },
+  javascriptreact = { "ts_ls", "eslint" },
+  json = { "jsonls" },
+  jsonc = { "jsonls" },
+  lua = { "lua_ls" },
+  python = { "pyright" },
+  tsx = { "ts_ls", "eslint" },
+  typescript = { "ts_ls", "eslint" },
+  typescriptreact = { "ts_ls", "eslint" },
+  yaml = { "yamlls" },
+  yml = { "yamlls" },
+  zig = { "zls" },
 }
 
 local function enable_installed_lsp_servers()
-  for server, executable in pairs(lsp_servers) do
-    if vim.fn.executable(executable) == 1 then
+  for server, tool in pairs(lsp_tools) do
+    if vim.fn.executable(tool.executable) == 1 then
       vim.lsp.enable(server)
     end
   end
+end
+
+local installing_lsp_packages = {}
+
+local function start_lsp_server(server, bufnr)
+  vim.lsp.enable(server)
+
+  if vim.api.nvim_buf_is_valid(bufnr) then
+    pcall(vim.cmd, "LspStart " .. server)
+  end
+end
+
+local function install_lsp_package(server, bufnr)
+  local tool = lsp_tools[server]
+
+  if not tool or vim.fn.executable(tool.executable) == 1 then
+    start_lsp_server(server, bufnr)
+    return
+  end
+
+  if installing_lsp_packages[tool.package] then
+    return
+  end
+
+  installing_lsp_packages[tool.package] = true
+
+  local registry = require("mason-registry")
+
+  registry.refresh(function()
+    local ok, package = pcall(registry.get_package, tool.package)
+
+    if not ok then
+      installing_lsp_packages[tool.package] = nil
+      return
+    end
+
+    package:once("closed", function()
+      installing_lsp_packages[tool.package] = nil
+
+      vim.schedule(function()
+        start_lsp_server(server, bufnr)
+      end)
+    end)
+
+    if package:is_installed() then
+      installing_lsp_packages[tool.package] = nil
+      start_lsp_server(server, bufnr)
+    else
+      package:install()
+    end
+  end)
 end
 
 enable_installed_lsp_servers()
@@ -396,6 +455,15 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     enable_installed_lsp_servers()
     install_treesitter_parsers()
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = vim.tbl_keys(lsp_filetypes),
+  callback = function(event)
+    for _, server in ipairs(lsp_filetypes[vim.bo[event.buf].filetype] or {}) do
+      install_lsp_package(server, event.buf)
+    end
   end,
 })
 
