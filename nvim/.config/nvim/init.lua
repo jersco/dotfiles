@@ -2,39 +2,23 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 vim.pack.add({
-  { src = "https://github.com/neanias/everforest-nvim", name = "everforest-nvim" },
-  { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
-  { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
-  { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
-  { src = "https://github.com/neovim/nvim-lspconfig", name = "nvim-lspconfig" },
-  { src = "https://github.com/mason-org/mason.nvim", name = "mason" },
+  { src = "https://github.com/nvim-tree/nvim-web-devicons",               name = "nvim-web-devicons" },
+  { src = "https://github.com/ibhagwan/fzf-lua",                          name = "fzf-lua" },
+  { src = "https://github.com/nvim-lualine/lualine.nvim",                 name = "lualine" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter",           name = "nvim-treesitter" },
+  { src = "https://github.com/neovim/nvim-lspconfig",                     name = "nvim-lspconfig" },
+  { src = "https://github.com/mason-org/mason.nvim",                      name = "mason" },
   { src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim", name = "mason-tool-installer" },
-  { src = "https://github.com/b0o/schemastore.nvim", name = "schemastore" },
-  { src = "https://github.com/stevearc/oil.nvim", name = "oil" },
-  { src = "https://github.com/vieitesss/miniharp.nvim", name = "miniharp", version = vim.version.range("v*") },
-  { src = "https://github.com/folke/which-key.nvim", name = "which-key" },
+  { src = "https://github.com/b0o/schemastore.nvim",                      name = "schemastore" },
+  { src = "https://github.com/stevearc/oil.nvim",                         name = "oil" },
+  { src = "https://github.com/vieitesss/miniharp.nvim",                   name = "miniharp",            version = vim.version.range("v*") },
+  { src = "https://github.com/folke/which-key.nvim",                      name = "which-key" },
 }, { confirm = false })
 
 vim.o.termguicolors = true
 vim.o.background = "dark"
 vim.o.mouse = "a"
 vim.o.clipboard = "unnamedplus"
-
-local has_everforest, everforest = pcall(require, "everforest")
-
-if has_everforest then
-  everforest.setup({
-    background = "hard",
-    transparent_background_level = 1,
-    italics = false,
-    disable_italic_comments = true,
-    ui_contrast = "high",
-    float_style = "dim",
-  })
-
-  vim.cmd.colorscheme("everforest")
-end
 
 vim.o.number = true
 vim.o.relativenumber = true
