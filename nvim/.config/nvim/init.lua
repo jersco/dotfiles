@@ -41,6 +41,7 @@ vim.o.relativenumber = true
 vim.o.cursorline = true
 vim.o.signcolumn = "yes"
 vim.o.wrap = false
+vim.o.linebreak = true
 vim.o.breakindent = true
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
