@@ -2,7 +2,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 vim.pack.add({
-  { src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
+  { src = "https://github.com/neanias/everforest-nvim", name = "everforest-nvim" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons", name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua", name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim", name = "lualine" },
@@ -21,20 +21,20 @@ vim.o.background = "dark"
 vim.o.mouse = "a"
 vim.o.clipboard = "unnamedplus"
 
-require("rose-pine").setup({
-  variant = "main",
-  dark_variant = "main",
-  styles = {
-    bold = true,
-    italic = false,
-    transparency = true,
-  },
-})
+local has_everforest, everforest = pcall(require, "everforest")
 
-vim.cmd.colorscheme("rose-pine")
+if has_everforest then
+  everforest.setup({
+    background = "hard",
+    transparent_background_level = 1,
+    italics = false,
+    disable_italic_comments = true,
+    ui_contrast = "high",
+    float_style = "dim",
+  })
 
-vim.api.nvim_set_hl(0, "PmenuBorder", { fg = "#6e6a86", bg = "#26233a" })
-vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#908caa", bg = "#26233a" })
+  vim.cmd.colorscheme("everforest")
+end
 
 vim.o.number = true
 vim.o.relativenumber = true
