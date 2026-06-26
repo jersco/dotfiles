@@ -1,3 +1,5 @@
 font-family = IosevkaTerm Nerd Font Mono
 font-size = 18
 theme = everforest-soft-dark
+background-opacity = 0.96
+background-opacity-cells = true
