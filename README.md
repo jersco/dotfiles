@@ -12,6 +12,7 @@ cd ~/dotfiles
 stow tmux
 stow nvim
 stow ghostty
+stow starship
 stow zsh
 stow zed
 ```

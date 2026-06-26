@@ -1,0 +1,80 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+palette = "everforest_dark_soft"
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$python\
+$character"""
+
+[directory]
+style = "aqua"
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+
+[git_branch]
+format = "[$branch]($style)"
+style = "green"
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](orange) ($ahead_behind$stashed)]($style)"
+style = "blue"
+conflicted = "​"
+untracked = "​"
+modified = "​"
+staged = "​"
+renamed = "​"
+deleted = "​"
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "grey1"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "yellow"
+
+[python]
+format = "[$virtualenv]($style) "
+style = "grey1"
+detect_extensions = []
+detect_files = []
+
+[palettes.everforest_dark_soft]
+bg0 = "#293136"
+bg1 = "#333C43"
+bg2 = "#3A464C"
+bg3 = "#434F55"
+bg4 = "#4D5960"
+bg5 = "#555F66"
+bg_visual = "#5D6B66"
+bg_red = "#5C3F4F"
+bg_green = "#48584E"
+bg_blue = "#3F5865"
+bg_yellow = "#55544A"
+bg_purple = "#4E4953"
+bg_aqua = "#3A515D"
+fg = "#D3C6AA"
+red = "#E67E80"
+orange = "#E69875"
+yellow = "#DBBC7F"
+green = "#A7C080"
+aqua = "#83C092"
+blue = "#7FBBB3"
+purple = "#D699B6"
+grey0 = "#7A8478"
+grey1 = "#859289"
+grey2 = "#9DA9A0"
+statusline1 = "#A7C080"
+statusline2 = "#D3C6AA"
+statusline3 = "#E67E80"
