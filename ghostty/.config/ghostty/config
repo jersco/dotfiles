@@ -6,5 +6,4 @@ theme = everforest-soft-dark
 background-opacity = 0.85
 background-opacity-cells = true
 background-blur = 16
-background = #000000
 macos-titlebar-style = hidden
