@@ -5,7 +5,8 @@ vim.pack.add({
   { src = "https://github.com/nvim-tree/nvim-web-devicons",               name = "nvim-web-devicons" },
   { src = "https://github.com/ibhagwan/fzf-lua",                          name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim",                 name = "lualine" },
-  { src = "https://github.com/sainnhe/everforest",                        name = "everforest" },
+  { src = "https://github.com/nvim-mini/mini.completion",                 name = "mini.completion" },
+  { src = "https://github.com/rebelot/kanagawa.nvim",                     name = "kanagawa.nvim" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter",           name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig",                     name = "nvim-lspconfig" },
   { src = "https://github.com/mason-org/mason.nvim",                      name = "mason" },
@@ -18,7 +19,6 @@ vim.pack.add({
 
 vim.o.termguicolors = true
 vim.o.background = "dark"
-vim.g.everforest_background = "soft"
 vim.o.mouse = "a"
 vim.o.clipboard = "unnamedplus"
 
@@ -49,8 +49,6 @@ vim.o.splitbelow = true
 vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.winborder = "rounded"
-vim.o.autocomplete = true
-vim.o.autocompletedelay = 0
 vim.o.completeopt = "menuone,noselect,fuzzy"
 vim.o.pumborder = "rounded"
 vim.o.pumheight = 10
@@ -63,7 +61,12 @@ vim.opt.wildignore:append({
   "*/build/*",
 })
 
-vim.cmd.colorscheme("everforest")
+require("kanagawa").setup({
+  theme = "dragon",
+  transparent = false,
+})
+
+vim.cmd.colorscheme("kanagawa-dragon")
 
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -75,6 +78,13 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 local fzf = require("fzf-lua")
 local miniharp = require("miniharp")
 local map = vim.keymap.set
+
+require("mini.completion").setup({
+  window = {
+    info = { border = "rounded" },
+    signature = { border = "rounded" },
+  },
+})
 
 miniharp.setup({
   autoload = true,
@@ -130,6 +140,7 @@ local treesitter_parsers = {
   lua = "lua",
   markdown = "markdown",
   markdown_inline = "markdown_inline",
+  odin = "odin",
   python = "python",
   query = "query",
   rust = "rust",
@@ -163,7 +174,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 require("lualine").setup({
   options = {
-    theme = "everforest",
+    theme = "auto",
     globalstatus = true,
     component_separators = { left = "│", right = "│" },
     section_separators = { left = "", right = "" },
@@ -258,19 +269,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
 
-    if client:supports_method("textDocument/completion") then
-      vim.lsp.completion.enable(true, client.id, event.buf, {
-        autotrigger = true,
-        convert = function(item)
-          return {
-            abbr = item.label:gsub("%b()", ""),
-            kind = item.kind and vim.lsp.protocol.CompletionItemKind[item.kind] or "",
-            menu = client.name,
-          }
-        end,
-      })
-    end
-
     if vim.lsp.inlay_hint and client:supports_method("textDocument/inlayHint") then
       vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
     end
@@ -341,7 +339,9 @@ local lsp_tools = {
   eslint = { package = "eslint-lsp", executable = "vscode-eslint-language-server" },
   jsonls = { package = "json-lsp", executable = "vscode-json-language-server" },
   lua_ls = { package = "lua-language-server", executable = "lua-language-server" },
+  ols = { package = "ols", executable = "ols" },
   pyright = { package = "pyright", executable = "pyright-langserver" },
+  rust_analyzer = { package = "rust-analyzer", executable = "rust-analyzer" },
   ts_ls = { package = "typescript-language-server", executable = "typescript-language-server" },
   yamlls = { package = "yaml-language-server", executable = "yaml-language-server" },
   zls = { package = "zls", executable = "zls" },
@@ -353,7 +353,9 @@ local lsp_filetypes = {
   json = { "jsonls" },
   jsonc = { "jsonls" },
   lua = { "lua_ls" },
+  odin = { "ols" },
   python = { "pyright" },
+  rust = { "rust_analyzer" },
   tsx = { "ts_ls", "eslint" },
   typescript = { "ts_ls", "eslint" },
   typescriptreact = { "ts_ls", "eslint" },
@@ -374,10 +376,6 @@ local installing_lsp_packages = {}
 
 local function start_lsp_server(server, bufnr)
   vim.lsp.enable(server)
-
-  if vim.api.nvim_buf_is_valid(bufnr) then
-    pcall(vim.cmd, "LspStart " .. server)
-  end
 end
 
 local function install_lsp_package(server, bufnr)
@@ -440,6 +438,24 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+local function restart_lsp()
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+    client:stop(true)
+  end
+
+  vim.defer_fn(function()
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+      return
+    end
+
+    for _, server in ipairs(lsp_filetypes[vim.bo[bufnr].filetype] or {}) do
+      install_lsp_package(server, bufnr)
+    end
+  end, 100)
+end
+
 map("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
 map("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
 map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
@@ -479,10 +495,9 @@ map("i", "<cr>", function()
   end
   return "<cr>"
 end, { expr = true, desc = "Accept completion or newline" })
-map("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger LSP completion" })
 map("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "LSP info" })
 map("n", "<leader>lm", "<cmd>Mason<cr>", { desc = "Mason" })
-map("n", "<leader>lr", "<cmd>LspRestart<cr>", { desc = "Restart LSP" })
+map("n", "<leader>lr", restart_lsp, { desc = "Restart LSP" })
 map("n", "<leader>co", "<cmd>copen<cr>", { desc = "Open quickfix" })
 map("n", "<leader>cc", "<cmd>cclose<cr>", { desc = "Close quickfix" })
 map("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
