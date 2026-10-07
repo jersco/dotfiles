@@ -32,6 +32,14 @@
       "rev": "d2a2b2a2b5350b713ade3bb744df39eee7d4229b",
       "src": "https://github.com/nvim-mini/mini.completion"
     },
+    "mini.icons": {
+      "rev": "f642e3ba8c12afbc8f32f6d77ef6597eac56786f",
+      "src": "https://github.com/nvim-mini/mini.icons"
+    },
+    "mini.snippets": {
+      "rev": "050638170639ceb7bef4e804507cbf209e565b2c",
+      "src": "https://github.com/nvim-mini/mini.snippets"
+    },
     "miniharp": {
       "rev": "a8fd9dadba00119f1d610936ef694515c448a47c",
       "src": "https://github.com/vieitesss/miniharp.nvim"

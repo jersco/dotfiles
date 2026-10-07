@@ -6,6 +6,8 @@ vim.pack.add({
   { src = "https://github.com/ibhagwan/fzf-lua",                          name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim",                 name = "lualine" },
   { src = "https://github.com/nvim-mini/mini.completion",                 name = "mini.completion" },
+  { src = "https://github.com/nvim-mini/mini.icons",                      name = "mini.icons" },
+  { src = "https://github.com/nvim-mini/mini.snippets",                   name = "mini.snippets" },
   { src = "https://github.com/kdheepak/lazygit.nvim",                    name = "lazygit.nvim" },
   { src = "https://github.com/rose-pine/neovim",                          name = "rose-pine" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter",           name = "nvim-treesitter" },
@@ -108,6 +110,15 @@ require("mini.completion").setup({
   },
 })
 
+require("mini.icons").setup()
+
+require("mini.snippets").setup({
+  snippets = {
+    require("mini.snippets").gen_loader.from_file("~/.config/nvim/snippets/global.json"),
+    require("mini.snippets").gen_loader.from_lang(),
+  },
+})
+
 miniharp.setup({
   autoload = true,
   autosave = true,
@@ -189,8 +200,6 @@ vim.api.nvim_create_autocmd("FileType", {
     if parser and not pcall(vim.treesitter.start) then
       pcall(treesitter.install, { parser })
     end
-
-    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end,
 })
 
@@ -274,21 +283,15 @@ vim.diagnostic.config({
   },
 })
 
+local lsp_icons_tweaked = false
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
     local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
     local opts = { buffer = event.buf, silent = true }
 
-    if client:supports_method("textDocument/formatting") then
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = event.buf,
-        callback = function()
-          vim.lsp.buf.format({
-            bufnr = event.buf,
-            timeout_ms = 3000,
-          })
-        end,
-      })
+    if not lsp_icons_tweaked then
+      require("mini.icons").tweak_lsp_kind()
+      lsp_icons_tweaked = true
     end
 
     if vim.lsp.inlay_hint and client:supports_method("textDocument/inlayHint") then
@@ -311,6 +314,43 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp_map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
     lsp_map("n", "<leader>ld", fzf.diagnostics_document, "Document diagnostics")
     lsp_map("n", "<leader>lD", fzf.diagnostics_workspace, "Workspace diagnostics")
+  end,
+})
+
+local formatters_by_filetype = {
+  javascript = { "eslint", "ts_ls" },
+  javascriptreact = { "eslint", "ts_ls" },
+  json = { "jsonls" },
+  jsonc = { "jsonls" },
+  lua = { "lua_ls" },
+  odin = { "ols" },
+  rust = { "rust_analyzer" },
+  tsx = { "eslint", "ts_ls" },
+  typescript = { "eslint", "ts_ls" },
+  typescriptreact = { "eslint", "ts_ls" },
+  yaml = { "yamlls" },
+  yml = { "yamlls" },
+  zig = { "zls" },
+}
+
+local format_group = vim.api.nvim_create_augroup("LspFormatOnSave", { clear = true })
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = format_group,
+  callback = function(event)
+    local preferred = formatters_by_filetype[vim.bo[event.buf].filetype]
+    if not preferred then
+      return
+    end
+
+    local clients = vim.lsp.get_clients({ bufnr = event.buf, method = "textDocument/formatting" })
+    for _, name in ipairs(preferred) do
+      for _, client in ipairs(clients) do
+        if client.name == name then
+          vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 3000 })
+          return
+        end
+      end
+    end
   end,
 })
 
@@ -421,14 +461,27 @@ local function install_lsp_package(server, bufnr)
 
     if not ok then
       installing_lsp_packages[tool.package] = nil
+      vim.notify(("Mason package %q was not found for %s"):format(tool.package, server), vim.log.levels.ERROR)
       return
     end
 
+    local installation_failed = false
     package:once("closed", function()
       installing_lsp_packages[tool.package] = nil
 
       vim.schedule(function()
-        start_lsp_server(server, bufnr)
+        if package:is_installed() then
+          start_lsp_server(server, bufnr)
+        elseif not installation_failed then
+          vim.notify(("Mason failed to install %s for %s"):format(tool.package, server), vim.log.levels.ERROR)
+        end
+      end)
+    end)
+
+    package:once("install:failed", function(result)
+      installation_failed = true
+      vim.schedule(function()
+        vim.notify(("Mason failed to install %s: %s"):format(tool.package, tostring(result)), vim.log.levels.ERROR)
       end)
     end)
 
@@ -436,6 +489,7 @@ local function install_lsp_package(server, bufnr)
       installing_lsp_packages[tool.package] = nil
       start_lsp_server(server, bufnr)
     else
+      vim.notify(("Installing %s for %s via Mason"):format(tool.package, server), vim.log.levels.INFO)
       package:install()
     end
   end)
