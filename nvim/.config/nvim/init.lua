@@ -6,7 +6,8 @@ vim.pack.add({
   { src = "https://github.com/ibhagwan/fzf-lua",                          name = "fzf-lua" },
   { src = "https://github.com/nvim-lualine/lualine.nvim",                 name = "lualine" },
   { src = "https://github.com/nvim-mini/mini.completion",                 name = "mini.completion" },
-  { src = "https://github.com/rebelot/kanagawa.nvim",                     name = "kanagawa.nvim" },
+  { src = "https://github.com/kdheepak/lazygit.nvim",                    name = "lazygit.nvim" },
+  { src = "https://github.com/rose-pine/neovim",                          name = "rose-pine" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter",           name = "nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig",                     name = "nvim-lspconfig" },
   { src = "https://github.com/mason-org/mason.nvim",                      name = "mason" },
@@ -18,7 +19,16 @@ vim.pack.add({
 }, { confirm = false })
 
 vim.o.termguicolors = true
-vim.o.background = "dark"
+local function system_background()
+  if vim.fn.has("mac") ~= 1 then
+    return vim.o.background
+  end
+
+  local result = vim.system({ "defaults", "read", "-g", "AppleInterfaceStyle" }, { text = true }):wait()
+  return result.code == 0 and result.stdout:match("Dark") and "dark" or "light"
+end
+
+vim.o.background = system_background()
 vim.o.mouse = "a"
 vim.o.clipboard = "unnamedplus"
 
@@ -38,8 +48,7 @@ vim.o.softtabstop = 2
 vim.o.expandtab = true
 vim.o.smartindent = true
 vim.o.textwidth = 80
-vim.o.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+vim.o.list = false
 
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -54,6 +63,9 @@ vim.o.pumborder = "rounded"
 vim.o.pumheight = 10
 vim.o.pumwidth = 35
 vim.o.pummaxwidth = 90
+vim.g.lazygit_floating_window_winblend = 0
+vim.g.lazygit_floating_window_scaling_factor = 0.9
+vim.g.lazygit_floating_window_border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
 vim.opt.wildignore:append({
   "*/.git/*",
   "*/node_modules/*",
@@ -61,12 +73,22 @@ vim.opt.wildignore:append({
   "*/build/*",
 })
 
-require("kanagawa").setup({
-  theme = "dragon",
-  transparent = false,
+require("rose-pine").setup({
+  variant = "auto",
+  dark_variant = "main",
 })
 
-vim.cmd.colorscheme("kanagawa-dragon")
+vim.cmd.colorscheme("rose-pine")
+
+vim.api.nvim_create_autocmd("FocusGained", {
+  callback = function()
+    local background = system_background()
+    if vim.o.background ~= background then
+      vim.o.background = background
+      vim.cmd.colorscheme("rose-pine")
+    end
+  end,
+})
 
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -462,6 +484,7 @@ map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
 map("i", "kj", "<esc>", { desc = "Exit insert mode" })
 map("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "Open floating file explorer" })
+map("n", "<leader>G", "<cmd>LazyGit<cr>", { desc = "Open LazyGit" })
 map("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
 map("n", "<leader>f", fzf.files, { desc = "Find files" })
 map("n", "<leader>g", fzf.live_grep, { desc = "Live grep" })

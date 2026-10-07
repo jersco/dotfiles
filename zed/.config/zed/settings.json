@@ -7,6 +7,20 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "ssh_connections": [
+    {
+      "host": "100.71.253.62",
+      "username": "ubuntu",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/ubuntu"
+          ]
+        }
+      ]
+    }
+  ],
   "diff_view_style": "unified",
   "proxy": "",
   "vim": {
@@ -300,10 +314,13 @@
       }
     }
   },
-  "vim_mode": true,
+  "vim_mode": false,
   "disable_ai": false,
+  "auto_install_extensions": {
+    "rose-pine-theme": true
+  },
   "icon_theme": {
-    "mode": "dark",
+    "mode": "system",
     "light": "Zed (Default)",
     "dark": "Zed (Default)"
   },
@@ -315,8 +332,8 @@
     "font_family": "IosevkaTerm Nerd Font Mono"
   },
   "theme": {
-    "mode": "dark",
-    "light": "One Light",
-    "dark": "Kanagawa Dragon"
+    "mode": "system",
+    "light": "Rosé Pine Dawn",
+    "dark": "Rosé Pine"
   }
 }
