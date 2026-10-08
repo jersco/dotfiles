@@ -8,6 +8,14 @@
       "rev": "d340ade20dfe4ef87e6f9a63b9905be91965b5dc",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
+    "kanagawa.nvim": {
+      "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
+      "src": "https://github.com/rebelot/kanagawa.nvim"
+    },
+    "lazygit.nvim": {
+      "rev": "9ffc6103926718f7070fb4017694543cd7dc9718",
+      "src": "https://github.com/kdheepak/lazygit.nvim"
+    },
     "lualine": {
       "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
@@ -19,6 +27,18 @@
     "mason-tool-installer": {
       "rev": "443f1ef8b5e6bf47045cb2217b6f748a223cf7dc",
       "src": "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
+    },
+    "mini.completion": {
+      "rev": "d2a2b2a2b5350b713ade3bb744df39eee7d4229b",
+      "src": "https://github.com/nvim-mini/mini.completion"
+    },
+    "mini.icons": {
+      "rev": "f642e3ba8c12afbc8f32f6d77ef6597eac56786f",
+      "src": "https://github.com/nvim-mini/mini.icons"
+    },
+    "mini.snippets": {
+      "rev": "050638170639ceb7bef4e804507cbf209e565b2c",
+      "src": "https://github.com/nvim-mini/mini.snippets"
     },
     "miniharp": {
       "rev": "a8fd9dadba00119f1d610936ef694515c448a47c",
@@ -39,6 +59,10 @@
     "oil": {
       "rev": "b91ee5a77a6a9605d9c1aaf4fda74b66082c8297",
       "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "rose-pine": {
+      "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
+      "src": "https://github.com/rose-pine/neovim"
     },
     "schemastore": {
       "rev": "735540a7602bffd1b07deab7d508affb57b78c64",

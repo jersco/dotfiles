@@ -7,11 +7,13 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "diff_view_style": "unified",
   "proxy": "",
   "vim": {
     "toggle_relative_line_numbers": true
   },
   "relative_line_numbers": "disabled",
+  "soft_wrap": "editor_width",
   "cli_default_open_behavior": "new_window",
   "project_panel": {
     "dock": "right"
@@ -23,6 +25,7 @@
     "dock": "right"
   },
   "agent": {
+    "button": true,
     "dock": "left",
     "favorite_models": [],
     "model_parameters": []
@@ -36,6 +39,10 @@
       "type": "registry"
     },
     "codex-acp": {
+      "default_config_options": {
+        "fast-mode": "off",
+        "mode": "agent-full-access"
+      },
       "type": "registry"
     },
     "claude-acp": {
@@ -293,9 +300,16 @@
       }
     }
   },
-  "vim_mode": true,
+  "vim_mode": false,
   "disable_ai": false,
-  "icon_theme": "Zed (Default)",
+  "auto_install_extensions": {
+    "rose-pine-theme": true
+  },
+  "icon_theme": {
+    "mode": "system",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
   "ui_font_size": 18.0,
   "buffer_font_size": 18.0,
   "ui_font_family": "Iosevka Nerd Font Mono",
@@ -304,8 +318,8 @@
     "font_family": "IosevkaTerm Nerd Font Mono"
   },
   "theme": {
-    "mode": "dark",
-    "light": "One Light",
-    "dark": "Everforest Dark Soft (regular)"
+    "mode": "system",
+    "light": "Rosé Pine Dawn",
+    "dark": "Rosé Pine"
   }
 }

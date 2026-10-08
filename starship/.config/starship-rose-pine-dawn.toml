@@ -1,0 +1,68 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+palette = "rose_pine_dawn"
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$python\
+$character"""
+
+[directory]
+style = "pine"
+
+[character]
+success_symbol = "[❯](foam)"
+error_symbol = "[❯](love)"
+vimcmd_symbol = "[❮](rose)"
+
+[git_branch]
+format = "[$branch]($style)"
+style = "iris"
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](rose) ($ahead_behind$stashed)]($style)"
+style = "rose"
+conflicted = "​"
+untracked = "​"
+modified = "​"
+staged = "​"
+renamed = "​"
+deleted = "​"
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "muted"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "gold"
+
+[python]
+format = "[$virtualenv]($style) "
+style = "muted"
+detect_extensions = []
+detect_files = []
+
+[palettes.rose_pine_dawn]
+base = "#faf4ed"
+surface = "#fffaf3"
+overlay = "#f2e9e1"
+muted = "#9893a5"
+subtle = "#797593"
+text = "#575279"
+love = "#b4637a"
+gold = "#ea9d34"
+rose = "#d7827e"
+pine = "#286983"
+foam = "#56949f"
+iris = "#907aa9"
+highlight_low = "#f4ede8"
+highlight_med = "#dfdad9"
+highlight_high = "#cecacd"
