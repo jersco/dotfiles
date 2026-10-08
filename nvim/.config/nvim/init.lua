@@ -78,6 +78,9 @@ vim.opt.wildignore:append({
 require("rose-pine").setup({
   variant = "auto",
   dark_variant = "main",
+  styles = {
+    transparency = true,
+  },
 })
 
 vim.cmd.colorscheme("rose-pine")
