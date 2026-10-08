@@ -2,4 +2,6 @@ font-family = IosevkaTerm Nerd Font Mono
 font-size = 18
 font-thicken = true
 font-thicken-strength = 1
+background-opacity = 0.96
+background-opacity-cells = true
 theme = dark:Rose Pine,light:Rose Pine Dawn
