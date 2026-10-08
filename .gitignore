@@ -1,3 +1,4 @@
 .DS_Store
 *.log
+hunk/.config/hunk/state.json
 zsh/.config/zsh/local.zsh

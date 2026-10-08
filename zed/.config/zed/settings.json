@@ -7,20 +7,6 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "ssh_connections": [
-    {
-      "host": "100.71.253.62",
-      "username": "ubuntu",
-      "args": [],
-      "projects": [
-        {
-          "paths": [
-            "/home/ubuntu"
-          ]
-        }
-      ]
-    }
-  ],
   "diff_view_style": "unified",
   "proxy": "",
   "vim": {
